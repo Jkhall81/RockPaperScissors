@@ -32,8 +32,41 @@ class RandomPlayer(Player):
 
 class HumanPlayer(Player):
     def move(self):
-        player_move = input('Rock, Paper, or Scissors? ').lower()
-        return player_move
+        while True:
+            player_move = input('Rock, Paper, or Scissors? ').lower()
+            if player_move in moves:
+                return player_move
+            else:
+                print("You fucked something up!! Try again!")
+
+
+class ReflectPlayer(Player):
+    def __init__(self):
+        super().__init__()
+        self.opponent_move = None
+
+    def move(self):
+        if self.opponent_move is None:
+            return random.choice(moves)
+        return self.opponent_move
+
+    def learn(self, my_move, their_move):
+        self.opponent_move = their_move
+
+
+class CyclePlayer(Player):
+    def __init__(self):
+        super().__init__()
+        self.last_move = None
+
+    def move(self):
+        if self.last_move is None:
+            return random.choice(moves)
+        index = moves.index(self.last_move)
+        return moves[(index + 1) % len(moves)]
+
+    def learn(self, my_move, their_move):
+        self.last_move = my_move
 
 
 def beats(one, two):
@@ -53,13 +86,13 @@ class Game:
         print(f"Player 1: {move1}  Player 2: {move2}")
 
         if beats(move1, move2):
-            print('Player 1 wins!')
+            print('Player 1 wins!\n')
             self.p1.increase_score()
         elif beats(move2, move1):
-            print('Player 2 wins!')
+            print('Player 2 wins!\n')
             self.p2.increase_score()
         else:
-            print("It's a tie!")
+            print("It's a tie!\n")
 
         self.p1.learn(move1, move2)
         self.p2.learn(move2, move1)
@@ -69,16 +102,22 @@ class Game:
         score2 = self.p2.get_score()
         print(f'Player 1 score: {score1}')
         print(f'Player 2 score: {score2}')
+        if score1 > score2:
+            print('Player 1 wins!!\n')
+        elif score2 > score1:
+            print('Player 2 wins!!\n')
+        else:
+            print('We have a tie!!\n')
 
     def play_game(self):
         print("Game start!")
-        for round in range(3):
-            print(f"Round {round + 1}:")
+        for game_round in range(3):
+            print(f"Round {game_round + 1}:\n")
             self.play_round()
         self.score()
         print("Game over!")
 
 
 if __name__ == '__main__':
-    game = Game(HumanPlayer(), RandomPlayer())
+    game = Game(HumanPlayer(), CyclePlayer())
     game.play_game()
