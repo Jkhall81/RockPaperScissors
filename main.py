@@ -9,16 +9,23 @@ in this game"""
 
 
 class Player:
+    def __init__(self):
+        self.score = 0
+
     def move(self):
         return 'rock'
 
     def learn(self, my_move, their_move):
         pass
 
+    def increase_score(self):
+        self.score += 1
+
+    def get_score(self):
+        return self.score
+
 
 class RandomPlayer(Player):
-    moves = ['rock', 'paper', 'scissors']
-
     def move(self):
         return random.choice(moves)
 
@@ -38,14 +45,31 @@ class Game:
         move1 = self.p1.move()
         move2 = self.p2.move()
         print(f"Player 1: {move1}  Player 2: {move2}")
+
+        if beats(move1, move2):
+            print('Player 1 wins!')
+            self.p1.increase_score()
+        elif beats(move2, move1):
+            print('Player 2 wins!')
+            self.p2.increase_score()
+        else:
+            print("It's a tie!")
+
         self.p1.learn(move1, move2)
         self.p2.learn(move2, move1)
+
+    def score(self):
+        score1 = self.p1.get_score()
+        score2 = self.p2.get_score()
+        print(f'Player 1 score: {score1}')
+        print(f'Player 2 score: {score2}')
 
     def play_game(self):
         print("Game start!")
         for round in range(3):
-            print(f"Round {round}:")
+            print(f"Round {round + 1}:")
             self.play_round()
+        self.score()
         print("Game over!")
 
 
